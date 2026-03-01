@@ -32,3 +32,7 @@ app.post("/join-school", (req, res) => {
   user.school = school;
   res.json(user);
 });
+
+app.get("/events", (req, res) => {
+  res.json(events);
+});
