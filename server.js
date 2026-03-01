@@ -46,3 +46,19 @@ app.post("/rsvp", (req, res) => {
   if (!event.attendees.includes(userEmail)) event.attendees.push(userEmail);
   res.json({ message: "RSVP successful" });
 });
+
+app.post("/create-event", (req, res) => {
+  const { title, date, creatorEmail } = req.body;
+  const creator = users.find(u => u.email === creatorEmail);
+  if (!creator) return res.status(404).json({ error: "Creator not found" });
+
+  const newEvent = {
+    id: events.length + 1,
+    title,
+    date,
+    creator: creator.username,
+    attendees: []
+  };
+  events.push(newEvent);
+  res.json({ message: "Event created", event: newEvent });
+});
