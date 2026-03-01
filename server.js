@@ -36,3 +36,13 @@ app.post("/join-school", (req, res) => {
 app.get("/events", (req, res) => {
   res.json(events);
 });
+
+app.post("/rsvp", (req, res) => {
+  const { eventId, userEmail } = req.body;
+  const event = events.find(e => e.id === eventId);
+  const user = users.find(u => u.email === userEmail);
+  if (!event || !user) return res.status(404).json({ error: "Event or user not found" });
+
+  if (!event.attendees.includes(userEmail)) event.attendees.push(userEmail);
+  res.json({ message: "RSVP successful" });
+});
