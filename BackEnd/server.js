@@ -1,0 +1,24 @@
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
+const userRoutes = require('./routes/users.js');
+const eventRoutes = require('./routes/events.js');
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+// Root route
+app.get('/', (req, res) => {
+  res.send('Campus Connect Backend is running!');
+});
+
+// API routes
+app.use('/users', userRoutes);
+app.use('/events', eventRoutes);
+app.use(express.static(path.join(__dirname, '../Public')));
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

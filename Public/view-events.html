@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>View Events</title>
+</head>
+<body>
+  <!-- Page title -->
+  <h1>Events</h1>
+
+  <!-- Button to navigate to create event page -->
+  <button onclick="goToCreate()">Create Event</button>
+
+  <!-- This is where events will be displayed -->
+  <ul id="eventList"></ul>
+
+  <script>
+    // Redirect user to create event page
+    function goToCreate() {
+      window.location.href = "create-event.html";
+    }
+
+    // Fetch all events from backend and display them
+    function loadEvents() {
+      fetch("http://localhost:5000/events")
+        .then(res => res.json()) // convert response to JSON
+        .then(data => {
+          const list = document.getElementById("eventList");
+          list.innerHTML = ""; // clear previous list
+
+          // Loop through each event
+          data.forEach(event => {
+            const li = document.createElement("li");
+
+            // Display event info + button to view
+            li.innerHTML = `
+              <strong>${event.title}</strong> - ${event.date}
+              <button onclick="viewEvent(${event.id})">View</button>
+            `;
+
+            list.appendChild(li);
+          });
+        });
+    }
+
+    // Redirect to RSVP page with event ID in URL
+    function viewEvent(id) {
+      window.location.href = `rsvp.html?id=${id}`;
+    }
+
+    // Load events when page opens
+    loadEvents();
+  </script>
+</body>
+</html>
