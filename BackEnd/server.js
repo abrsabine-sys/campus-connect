@@ -10,15 +10,15 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Root route
+app.use(express.static(path.join(__dirname, 'Public')));
+
 app.get('/', (req, res) => {
-  res.send('Campus Connect Backend is running!');
+  res.sendFile(path.join(__dirname, 'Public', 'index.html'));
 });
 
 // API routes
 app.use('/users', userRoutes);
 app.use('/events', eventRoutes);
-app.use(express.static(path.join(__dirname, 'Public')));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
