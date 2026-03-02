@@ -10,10 +10,12 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use(express.static(path.join(__dirname, 'Public')));
+// Serve all static files from the root-level Public folder
+app.use(express.static(path.join(__dirname, '..', 'Public')));
 
+// Root route serves index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Public', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'Public', 'index.html'));
 });
 
 // API routes
