@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/users', userRoutes);
 app.use('/events', eventRoutes);
-app.use(express.static(path.join(__dirname, '../Public')));
+app.use(express.static(path.join(__dirname, 'Public')));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
