@@ -1,4 +1,65 @@
-body { font-family: Arial; max-width: 600px; margin: auto; padding: 20px; }
-input, button { display: block; margin: 10px 0; padding: 8px; width: 100%; }
-h1 { text-align: center; }
-ul { list-style: none; padding: 0; }
+/* General page styling */
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  background:#f4f6f8;
+  max-width:700px;
+  margin:auto;
+  padding:20px;
+}
+
+/* Page titles */
+h1{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+/* Card containers */
+.card{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Event cards */
+.event-card{
+  background:white;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+  box-shadow:0 1px 5px rgba(0,0,0,0.1);
+}
+
+/* Inputs */
+input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+
+/* Buttons */
+button{
+  padding:10px;
+  margin-top:10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+/* Primary buttons */
+button.primary{
+  background:#0077ff;
+  color:white;
+}
+
+/* Hover effect */
+button:hover{
+  opacity:0.9;
+}
+
+ul{
+  list-style:none;
+  padding:0;
+}

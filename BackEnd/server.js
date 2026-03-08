@@ -1,28 +1,20 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
 
-const userRoutes = require('./routes/users.js');
-const eventRoutes = require('./routes/events.js');
+const eventRoutes = require("./routes/events");
 
 const app = express();
+
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Serve all static files from the root-level Public folder
-app.use(express.static(path.join(__dirname, '..', 'Public')));
+app.use("/events", eventRoutes);
 
-// Root route serves index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'Public', 'index.html'));
-});
+app.use(express.static(path.join(__dirname, "..", "Public")));
 
-// API routes
-app.use('/users', userRoutes);
-app.use('/events', eventRoutes);
+const PORT = 5000;
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log("Server running on port 5000");
 });

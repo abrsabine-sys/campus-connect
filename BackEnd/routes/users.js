@@ -1,28 +1,23 @@
-// BackEnd/routes/users.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
+const User = require("../model/user.js");
 
-// Correct relative path to model
-const User = require('../model/user.js');
+// register
+router.post("/register", (req, res) => {
+  const { username, email } = req.body;
+  if (!username || !email) return res.status(400).json({ error: "Missing fields" });
 
-// Register a new user
-router.post('/register', (req, res) => {
-  const { name, email } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ error: 'Name and email required' });
-  }
-
-  const newUser = User.create({ name, email });
-  res.json(newUser);
+  const user = User.create({ username, email });
+  res.json(user);
 });
 
-// Join a school
-router.post('/:id/join-school', (req, res) => {
-  const { id } = req.params;
-  const { school } = req.body;
+// join school
+router.post("/join-school", (req, res) => {
+  const { userId, school } = req.body;
 
-  const user = User.joinSchool(Number(id), school);
-  if (!user) return res.status(404).json({ error: 'User not found' });
+  const user = User.joinSchool(userId, school);
+
+  if (!user) return res.status(404).json({ error: "User not found" });
 
   res.json(user);
 });

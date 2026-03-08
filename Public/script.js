@@ -1,101 +1,185 @@
-const API_URL = 'http://localhost:5000';
+const API = "http://localhost:5000";
 
-// Registration
-const registerForm = document.getElementById('registerForm');
+/* REGISTER USER */
+
+const registerForm = document.getElementById("registerForm");
+
 if (registerForm) {
-  registerForm.addEventListener('submit', async (e) => {
+  registerForm.addEventListener("submit", async (e) => {
+
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(registerForm));
-    const res = await fetch(`${API_URL}/users/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+
+    const form = new FormData(registerForm);
+
+    const data = {
+      username: form.get("username"),
+      email: form.get("email")
+    };
+
+    const res = await fetch(`${API}/users/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(data)
     });
+
     const user = await res.json();
-    localStorage.setItem('userId', user.id);
-    window.location.href = 'join-school.html';
+
+    localStorage.setItem("userId", user.id);
+    localStorage.setItem("username", user.username);
+
+    window.location.href = "join-school.html";
   });
 }
 
-// Join School
-const joinSchoolForm = document.getElementById('joinSchoolForm');
+
+/* JOIN SCHOOL */
+
+const joinSchoolForm = document.getElementById("joinSchoolForm");
+
 if (joinSchoolForm) {
-  joinSchoolForm.addEventListener('submit', async (e) => {
+  joinSchoolForm.addEventListener("submit", async (e) => {
+
     e.preventDefault();
-    const userId = localStorage.getItem('userId');
-    const data = { userId, school: joinSchoolForm.school.value };
-    await fetch(`${API_URL}/users/join-school`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+
+    const userId = localStorage.getItem("userId");
+    const school = joinSchoolForm.school.value;
+
+    await fetch(`${API}/users/join-school`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ userId, school })
     });
-    window.location.href = 'view-events.html';
+
+    window.location.href = "view-events.html";
+
   });
 }
 
-// View Events
-const eventList = document.getElementById('eventList');
-if (eventList) {
-  fetch(`${API_URL}/events`)
-    .then(res => res.json())
-    .then(events => {
-      events.forEach(e => {
-        const li = document.createElement('li');
-        li.innerHTML = `ID: ${e.id} | ${e.title} | ${e.date} | Attendees: ${e.attendees.length} <button onclick="rsvp(${e.id})">RSVP</button>`;
-        eventList.appendChild(li);
-      });
-    });
-}
 
-// RSVP function
-async function rsvp(eventId) {
-  const userId = localStorage.getItem('userId');
-  const username = 'testuser'; // replace with dynamic username if stored
-  await fetch(`${API_URL}/events/rsvp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ eventId, username })
-  });
-  alert('RSVP Successful!');
-  window.location.reload();
-}
-
-// Create Event
-const createEventForm = document.getElementById('createEventForm');
-if (createEventForm) {
-  createEventForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(createEventForm));
-    const res = await fetch(`${API_URL}/events/create`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, creator: 'testuser' })
-    });
-    alert('Event Created!');
-    window.location.href = 'view-events.html';
-  });
-}
+/* LOAD EVENTS */
 
 async function loadEvents() {
-  const res = await fetch('http://localhost:5000/events');
+
+  const container = document.getElementById("eventList");
+
+  if (!container) return;
+
+  const res = await fetch(`${API}/events`);
+
   const events = await res.json();
 
-  const container = document.getElementById('eventsContainer');
-  container.innerHTML = '';
+  container.innerHTML = "";
+
+  if (events.length === 0) {
+
+    container.innerHTML = "<li>There are no current events.</li>";
+
+    return;
+  }
 
   events.forEach(event => {
-    const div = document.createElement('div');
 
-    div.innerHTML = `
-      <h3>${event.title}</h3>
-      <p>Date: ${event.date}</p>
-      <p>Attendees: ${event.attendees.length}</p>
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <strong onclick="goToRSVP(${event.id})" style="cursor:pointer">${event.title}</strong>
+      <br>
+      Date: ${event.date}
+      <br>
+      Organizer: ${event.creator}
+      <br>
+      Attendees: ${event.attendees.length}
+      <br>
       <button onclick="rsvp(${event.id})">RSVP</button>
+      <hr>
     `;
 
-    container.appendChild(div);
+    container.appendChild(li);
+
   });
+
 }
 
-// Load events when page opens
-window.onload = loadEvents;
+
+/* GO TO RSVP PAGE */
+
+function goToRSVP(eventId) {
+
+  window.location.href = `rsvp.html?id=${eventId}`;
+
+}
+
+
+/* RSVP */
+
+async function rsvp(eventId) {
+
+  const username = localStorage.getItem("username");
+
+  if (!username) {
+
+    alert("Please register first");
+
+    return;
+
+  }
+
+  await fetch(`${API}/events/rsvp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ eventId, username })
+  });
+
+  loadEvents();
+
+}
+
+
+/* CREATE EVENT */
+
+async function createEvent() {
+
+  const title = document.getElementById("title").value;
+  const date = document.getElementById("date").value;
+  const creator =
+    document.getElementById("creator").value ||
+    localStorage.getItem("username");
+
+  if (!title || !date || !creator) {
+
+    alert("Please fill out all fields");
+
+    return;
+
+  }
+
+  await fetch(`${API}/events/create`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ title, date, creator })
+  });
+
+  /* clear inputs */
+
+  document.getElementById("title").value = "";
+  document.getElementById("date").value = "";
+  document.getElementById("creator").value = "";
+
+  /* reload events so it appears immediately */
+
+  loadEvents();
+
+}
+
+
+/* PAGE LOAD */
+
+window.addEventListener("load", loadEvents);

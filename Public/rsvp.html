@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RSVP</title>
+</head>
+
+<body>
+
+<h1>Event RSVP</h1>
+
+<div id="eventDetails"></div>
+
+<br>
+
+<input id="username" placeholder="Your Name">
+
+<button onclick="rsvp()">RSVP</button>
+
+<br><br>
+
+<button onclick="window.location.href='view-events.html'">Back to Events</button>
+
+<script>
+
+const API = "http://localhost:5000";
+
+const params = new URLSearchParams(window.location.search);
+const eventId = params.get("id");
+
+async function loadEvent(){
+
+  const res = await fetch(`${API}/events`);
+  const events = await res.json();
+
+  const event = events.find(e => e.id == eventId);
+
+  const div = document.getElementById("eventDetails");
+
+  if(!event){
+    div.innerHTML = "Event not found";
+    return;
+  }
+
+  div.innerHTML = `
+    <strong>${event.title}</strong><br>
+    Date: ${event.date}<br>
+    Organizer: ${event.creator}<br>
+    Attendees: ${event.attendees.length}
+  `;
+
+}
+
+async function rsvp(){
+
+  const username = document.getElementById("username").value;
+
+  if(!username){
+    alert("Enter your name");
+    return;
+  }
+
+  await fetch(`${API}/events/rsvp`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({eventId,username})
+  });
+
+  alert("RSVP successful");
+
+  loadEvent();
+
+}
+
+window.onload = loadEvent;
+
+</script>
+
+</body>
+</html>

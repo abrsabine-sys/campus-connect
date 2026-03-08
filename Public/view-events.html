@@ -1,54 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>View Events</title>
+<title>Campus Events</title>
 </head>
+
 <body>
-  <!-- Page title -->
-  <h1>Events</h1>
 
-  <!-- Button to navigate to create event page -->
-  <button onclick="goToCreate()">Create Event</button>
+<h1>Campus Events</h1>
 
-  <!-- This is where events will be displayed -->
-  <ul id="eventList"></ul>
+<h2>Create Event</h2>
 
-  <script>
-    // Redirect user to create event page
-    function goToCreate() {
-      window.location.href = "create-event.html";
-    }
+<input id="title" placeholder="Event Title">
+<input id="date" type="date">
+<input id="creator" placeholder="Organizer Name">
 
-    // Fetch all events from backend and display them
-    function loadEvents() {
-      fetch("http://localhost:5000/events")
-        .then(res => res.json()) // convert response to JSON
-        .then(data => {
-          const list = document.getElementById("eventList");
-          list.innerHTML = ""; // clear previous list
+<button onclick="createNewEvent()">Create Event</button>
 
-          // Loop through each event
-          data.forEach(event => {
-            const li = document.createElement("li");
+<hr>
 
-            // Display event info + button to view
-            li.innerHTML = `
-              <strong>${event.title}</strong> - ${event.date}
-              <button onclick="viewEvent(${event.id})">View</button>
-            `;
+<h2>Event List</h2>
 
-            list.appendChild(li);
-          });
-        });
-    }
+<ul id="eventList"></ul>
 
-    // Redirect to RSVP page with event ID in URL
-    function viewEvent(id) {
-      window.location.href = `rsvp.html?id=${id}`;
-    }
+<script>
 
-    // Load events when page opens
-    loadEvents();
-  </script>
+const API = "http://localhost:5000";
+
+/* LOAD EVENTS */
+
+async function loadEvents(){
+
+  const res = await fetch(`${API}/events`);
+  const events = await res.json();
+
+  const list = document.getElementById("eventList");
+  list.innerHTML = "";
+
+  if(events.length === 0){
+    list.innerHTML = "<li>There are no current events.</li>";
+    return;
+  }
+
+  events.forEach(event => {
+
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <strong>${event.title}</strong><br>
+      Date: ${event.date}<br>
+      Organizer: ${event.creator}<br>
+      Attendees: ${event.attendees.length}
+      <br>
+      <button onclick="goToEvent(${event.id})">RSVP</button>
+      <hr>
+    `;
+
+    list.appendChild(li);
+
+  });
+
+}
+
+/* CREATE EVENT */
+
+async function createNewEvent(){
+
+  const title = document.getElementById("title").value;
+  const date = document.getElementById("date").value;
+  const creator = document.getElementById("creator").value;
+
+  if(!title || !date || !creator){
+    alert("Fill in all fields");
+    return;
+  }
+
+  await fetch(`${API}/events/create`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({title,date,creator})
+  });
+
+  document.getElementById("title").value = "";
+  document.getElementById("date").value = "";
+  document.getElementById("creator").value = "";
+
+  loadEvents();
+
+}
+
+/* GO TO RSVP PAGE */
+
+function goToEvent(id){
+  window.location.href = `rsvp.html?id=${id}`;
+}
+
+window.onload = loadEvents;
+
+</script>
+
 </body>
 </html>
