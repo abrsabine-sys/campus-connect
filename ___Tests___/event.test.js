@@ -1,24 +1,38 @@
-const request = require('supertest');
-const express = require('express');
-const bodyParser = require('body-parser');
-const eventRoutes = require('../BackEnd/routes/events');
+const { createEvent, getAllEvents, rsvp, cancelRSVP, deleteEvent } = require("../BackEnd/model/event");
 
-const app = express();
-app.use(bodyParser.json());
-app.use('/events', eventRoutes);
-
-describe('Events API', () => {
-  it('should create a new event', async () => {
-    const res = await request(app)
-      .post('/events/create')
-      .send({ title: 'Test Event', date: '2026-03-05', creator: 'Alice' });
-    expect(res.statusCode).toEqual(201);
-    expect(res.body.title).toBe('Test Event');
+describe("Event Model Tests", () => {
+  test("should create a new event", () => {
+    const event = createEvent({
+      title: "Hackathon",
+      date: "2026-03-09",
+      creator: "Admin"
+    });
+    expect(event).toHaveProperty("id");
+    expect(event.title).toBe("Hackathon");
+    expect(event.date).toBe("2026-03-09");
+    expect(event.creator).toBe("Admin");
+    expect(event.attendees).toEqual([]);
   });
 
-  it('should get all events', async () => {
-    const res = await request(app).get('/events');
-    expect(res.statusCode).toEqual(200);
-    expect(Array.isArray(res.body)).toBe(true);
+  test("should return all events", () => {
+    const events = getAllEvents();
+    expect(events.length).toBeGreaterThan(0);
+  });
+
+  test("should RSVP a user to an event", () => {
+    const event = rsvp(1, "TestUser");
+    expect(event.attendees).toContain("TestUser");
+  });
+
+  test("should cancel RSVP for a user", () => {
+    const event = cancelRSVP(1, "TestUser");
+    expect(event.attendees).not.toContain("TestUser");
+  });
+
+  test("should delete an event", () => {
+    const result = deleteEvent(1);
+    expect(result).toBe(true);
+    const events = getAllEvents();
+    expect(events.find(e => e.id === 1)).toBeUndefined();
   });
 });
