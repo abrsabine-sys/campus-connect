@@ -1,102 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Campus Events</title>
+  <title>Event Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <h1>Event Dashboard</h1>
 
-<h1>Campus Events</h1>
+  <button onclick="logout()">Logout</button>
 
-<h2>Create Event</h2>
+  <hr>
 
-<input id="title" placeholder="Event Title">
-<input id="date" type="date">
-<input id="creator" placeholder="Organizer Name">
+  <h2>Create Event</h2>
+  <input id="title" placeholder="Event Title">
+  <input type="date" id="date">
+  <input id="creator" placeholder="Organizer Name">
+  <button onclick="createNewEvent()">Create Event</button>
 
-<button onclick="createNewEvent()">Create Event</button>
+  <hr>
 
-<hr>
+  <h2>Filter Events</h2>
+  <input type="date" id="filterDate">
+  <button onclick="filterEvents()">Filter</button>
+  <button onclick="showEvents()">Reset</button>
 
-<h2>Event List</h2>
+  <hr>
 
-<ul id="eventList"></ul>
+  <h2>All Events</h2>
+  <div id="events"></div>
 
-<script>
-
-const API = "http://localhost:5000";
-
-/* LOAD EVENTS */
-
-async function loadEvents(){
-
-  const res = await fetch(`${API}/events`);
-  const events = await res.json();
-
-  const list = document.getElementById("eventList");
-  list.innerHTML = "";
-
-  if(events.length === 0){
-    list.innerHTML = "<li>There are no current events.</li>";
-    return;
-  }
-
-  events.forEach(event => {
-
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      <strong>${event.title}</strong><br>
-      Date: ${event.date}<br>
-      Organizer: ${event.creator}<br>
-      Attendees: ${event.attendees.length}
-      <br>
-      <button onclick="goToEvent(${event.id})">RSVP</button>
-      <hr>
-    `;
-
-    list.appendChild(li);
-
-  });
-
-}
-
-/* CREATE EVENT */
-
-async function createNewEvent(){
-
-  const title = document.getElementById("title").value;
-  const date = document.getElementById("date").value;
-  const creator = document.getElementById("creator").value;
-
-  if(!title || !date || !creator){
-    alert("Fill in all fields");
-    return;
-  }
-
-  await fetch(`${API}/events/create`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({title,date,creator})
-  });
-
-  document.getElementById("title").value = "";
-  document.getElementById("date").value = "";
-  document.getElementById("creator").value = "";
-
-  loadEvents();
-
-}
-
-/* GO TO RSVP PAGE */
-
-function goToEvent(id){
-  window.location.href = `rsvp.html?id=${id}`;
-}
-
-window.onload = loadEvents;
-
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>

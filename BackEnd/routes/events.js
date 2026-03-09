@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { createEvent, getAllEvents, rsvp } = require("../model/event");
+const { createEvent, getAllEvents, rsvp, cancelRSVP, deleteEvent } = require("../model/event");
 
 // CREATE EVENT
 router.post("/create", (req, res) => {
@@ -28,6 +28,30 @@ router.post("/rsvp", (req, res) => {
   }
 
   res.json(updated);
+});
+
+// CANCEL RSVP
+router.post("/cancel-rsvp", (req, res) => {
+
+  const { eventId, username } = req.body;
+
+  const event = cancelRSVP(eventId, username);
+
+  if (!event) return res.status(404).json({ error: "Event not found" });
+
+  res.json(event);
+
+});
+
+// DELETE EVENT
+router.post("/delete", (req, res) => {
+
+  const { eventId } = req.body;
+
+  deleteEvent(eventId);
+
+  res.json({ success: true });
+
 });
 
 module.exports = router;

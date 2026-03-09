@@ -28,4 +28,24 @@ function rsvp(eventId, username) {
   return event;
 }
 
-module.exports = { createEvent, getAllEvents, rsvp };
+function cancelRSVP(eventId, username) {
+
+  const event = events.find(e => e.id == eventId);
+
+  if (!event) return null;
+
+  event.attendees = event.attendees.filter(u => u !== username);
+
+  return event;
+}
+
+/* DELETE EVENT */
+
+function deleteEvent(eventId) {
+
+  events = events.filter(e => e.id != eventId);
+
+  return true;
+
+}
+module.exports = { createEvent, getAllEvents, rsvp, cancelRSVP, deleteEvent };
